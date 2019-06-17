@@ -1,2 +1,2 @@
 # FileUpload
-Provide file upload service in the built website
+  这是一个没用使用任何框架的关于文件上传的简单的项目，类FileUploadServlet继承自BaseServlet。BaseServlet使用反射将网页中的post请求参数"upload"反射至FileUploadServlet中的upload方法中，其中upload方法即是实现文件上传功能的方法。在upload方法中已经实现了按年月分类文件夹，例如2019文件夹下存在1、2、3等文件夹。文件使用UUID生成的UUID命名。
