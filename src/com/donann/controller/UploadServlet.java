@@ -19,15 +19,13 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.donann.domain.Member;
-import com.donann.server.MemberServer;
-import com.donann.server.impl.MemberServerImpl;
-import com.donann.utils.UUIDUtil;
+import com.donann.util.UUIDUtils;
 
 /**
  * Servlet implementation class UploadServlet
  */
 public class UploadServlet extends BaseServlet {
-	private MemberServer memberServer=new MemberServerImpl();
+	
 	private static final long serialVersionUID = 1L;
        
     /**
@@ -41,62 +39,40 @@ public class UploadServlet extends BaseServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void upload(HttpServletRequest request, HttpServletResponse response) throws 
-
-ServletException, IOException {
-		// TODO Auto-generated method stub
-
-		
+	protected void upload(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//现在1.创建DiskFileItemFactory核心对象
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		//2.创建上传处理器
 		ServletFileUpload handler = new ServletFileUpload(factory);
 		//3.调用处理器的方法，来解析HTTP请求
-		List<Member> mem =null;
 		try {
 			//items就是解析到的每部分内容
 			List<FileItem> items = handler.parseRequest(request);
 			for(FileItem item : items) {
-				//每一个item就是解析出来的内容，要获取你关心的内容，肯定是要调用FileItem
-
-对象的方法
-				if(item.isFormField()) {//isFormField方法用来判断此项是否是一个普通的表
-
-单域
+				//每一个item就是解析出来的内容，要获取你关心的内容，肯定是要调用FileItem对象的方法
+				if(item.isFormField()) {//isFormField方法用来判断此项是否是一个普通的表单域
 					//关心表单域的name属性
 					//关心对应的value值
 //					System.out.println(item.getFieldName()+":"+item.getString());
 					//如果表单域的值包含中文，且出现了中文乱码
-					System.out.println(item.getFieldName()+":"+item.getString
-
-("utf-8"));
+					System.out.println(item.getFieldName()+":"+item.getString("utf-8"));
 				
 				}else {
 					//说明这是包含文件信息的上传域
 					//getString方法获取的是文本形式的文件内容（不可取）
-//					System.out.println(item.getFieldName()+":"+item.getString
-
-("gbk"));	
+//					System.out.println(item.getFieldName()+":"+item.getString("gbk"));	
 					//getName方法返回的才是上传的文件的名称
-					System.out.println("--"+item.getFieldName()+":"+item.getName
-
-());
+					System.out.println("--"+item.getFieldName()+":"+item.getName());
 					//文件的内容，通过getInputStream流的方式来读取
 					InputStream is = item.getInputStream();
 //					web.xml配置文件路径
-//					String path =getServletContext().getInitParameter("upload-
-
-dir");
-	
-					
+//					String path =getServletContext().getInitParameter("upload-dir");
 					//实现按年月日分类文件
 					Date now=new Date();
 					DateFormat df = new SimpleDateFormat("yyyy-M-dd HH:mm:ss");
 					String dateString=df.format(now);
 					String year=dateString.substring(0, dateString.indexOf('-'));
-					String month=dateString.substring(dateString.indexOf
-
-('-')+1,dateString.lastIndexOf('-'));
+					String month=dateString.substring(dateString.indexOf('-')+1,dateString.lastIndexOf('-'));
 					System.out.println(year+" "+month);
 					
 					String path=getServletContext().getRealPath("/images/avatar");
@@ -106,12 +82,7 @@ dir");
 					System.out.println("==============");
 					System.out.println(path);
 					File uploadDir = new File(path);
-					
-					String email=request.getParameter("email");
-					System.out.println(request.getParameter("email"));
-					Member member=new Member(email);
-					
-					
+															
 					if(!uploadDir.exists()) {
 						new File(path).mkdirs();
 					}
@@ -125,29 +96,21 @@ dir");
 					 */
 					//使用UUID的唯一性转换为字符串存入文件名中
 					String oldName=item.getName();
-					String newName=UUIDUtil.getuuid();
+					String newName=UUIDUtils.getuuid();
 					//测试输出.jpg
-					System.out.println(oldName.substring(oldName.lastIndexOf
-
-('.')));
-					File img=new File(path,newName+oldName.substring
-
-(oldName.lastIndexOf('.')));
+					System.out.println(oldName.substring(oldName.lastIndexOf('.')));
+					File img=new File(path,newName+oldName.substring(oldName.lastIndexOf('.')));
 					FileOutputStream fos = new FileOutputStream(img);
 					String avatar=img.getCanonicalPath();
 					avatar=avatar.substring(pathLength+1);
 					System.out.println(avatar);
-					member.setAvatar(avatar);
-					
-					memberServer.uploadAvatar(member);
-					
+				
 					byte[] buffer = new byte[1024];
 					int len = -1;
 					while((len=is.read(buffer))!=-1) {
 						fos.write(buffer, 0, len);
 					}
-					mem= memberServer.getMessage(member);
-					System.out.println("GG--"+mem.get(0).getLevel());
+					System.out.println("GG--");
 					//关闭流
 					fos.close();
 					is.close();
@@ -156,8 +119,7 @@ dir");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		request.setAttribute("mem", mem.get(0));
-		request.getRequestDispatcher("/member.jsp").forward(request, response);
+		request.getRequestDispatcher("/upload.jsp").forward(request, response);
 	}
 
 }
