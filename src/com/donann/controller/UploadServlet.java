@@ -19,7 +19,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.donann.domain.Member;
-import com.donann.util.UUIDUtils;
+import com.donann.utils.UUIDUtil;
 
 /**
  * Servlet implementation class UploadServlet
@@ -96,7 +96,7 @@ public class UploadServlet extends BaseServlet {
 					 */
 					//使用UUID的唯一性转换为字符串存入文件名中
 					String oldName=item.getName();
-					String newName=UUIDUtils.getuuid();
+					String newName=UUIDUtil.getuuid();
 					//测试输出.jpg
 					System.out.println(oldName.substring(oldName.lastIndexOf('.')));
 					File img=new File(path,newName+oldName.substring(oldName.lastIndexOf('.')));
